@@ -4,12 +4,20 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class ItemListDisplayActivity extends AppCompatActivity {
+
+    private RecyclerView mRecyclerView;
+    private ItemAdaptor mItemAdaptor;
+    String[] items = {"first", "Second", "Third", "fourth"};
+    String[] descriptions = {"first string", "Second string", "Third string", "fourth string"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +34,13 @@ public class ItemListDisplayActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, items, descriptions);
+        mRecyclerView.setAdapter(mItemAdaptor);
     }
 
     @Override
