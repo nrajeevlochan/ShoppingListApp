@@ -3,7 +3,9 @@ package com.shoppinglistapp;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -45,7 +47,7 @@ public class ItemAdaptor extends RecyclerView.Adapter<ItemAdaptor.ViewHolder> {
         return (itemset == null) ? 0 : itemset.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         public TextView itemName;
         public TextView itemDescription;
 
@@ -53,19 +55,41 @@ public class ItemAdaptor extends RecyclerView.Adapter<ItemAdaptor.ViewHolder> {
             super(itemView);
             itemName = (TextView) itemView.findViewById(R.id.item_name);
             itemDescription = (TextView)itemView.findViewById(R.id.item_desc);
-            itemView.setOnClickListener(this);
+            itemView.setOnCreateContextMenuListener(this);
         }
 
         @Override
-        public void onClick(View v) {
-            if(mItemClickListener != null) {
-                mItemClickListener.onItemClick(v, getLayoutPosition());
-            }
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.setHeaderTitle("Action");
+            MenuItem myEditAction = menu.add(0, 0, 0, "Edit Item");
+            myEditAction.setOnMenuItemClickListener(mOnEditActionClickListener);
+            MenuItem myDeleteAction = menu.add(0, 1, 1, "delete Item");
+            myDeleteAction.setOnMenuItemClickListener(mOnDeleteActionClickListener);
         }
+
+        private final MenuItem.OnMenuItemClickListener mOnEditActionClickListener = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if(mItemClickListener != null) {
+                    mItemClickListener.onItemClick(item.getItemId(), getLayoutPosition());
+                }
+                return true;
+            }
+        };
+
+        private final MenuItem.OnMenuItemClickListener mOnDeleteActionClickListener = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if(mItemClickListener != null) {
+                    mItemClickListener.onItemClick(item.getItemId(), getLayoutPosition());
+                }
+                return true;
+            }
+        };
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view , int position);
+        void onItemClick(int actionType, int position);
     }
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {

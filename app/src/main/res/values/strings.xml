@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">ShoppingListApp</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_add">Add</string>
+    <string name="item_name">item name</string>
+    <string name="item_desc">item description</string>
+    <string name="add_item">add item</string>
+    <string name="cancel">cancel</string>
+    <string name="dialog_title">Add Items</string>
 </resources>
