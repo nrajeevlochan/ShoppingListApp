@@ -10,10 +10,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -84,6 +86,18 @@ public class ItemListDisplayActivity extends AppCompatActivity implements ItemIn
                             break;
                     }
                 }
+            }
+        });
+
+        ItemTouchHelper.Callback callback = new ItemMyTouchHelper(mItemAdaptor);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
+        ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
+            @Override
+            public void onItemSwipe(int position) {
+                itemset.remove(position);
+                mItemAdaptor.notifyDataSetChanged();
+                //Toast.makeText(MainActivity.this, "position: " + position, Toast.LENGTH_SHORT).show();
             }
         });
     }
