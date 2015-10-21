@@ -8,22 +8,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * Created by r.nalluru on 10/20/15.
  */
 public class ItemAdaptor extends RecyclerView.Adapter<ItemAdaptor.ViewHolder> {
 
     private Context context;
-    private String[] items;
-    private String[] descriptions;
+    private ArrayList<Item> itemset;
     private int rowLayout;
     OnItemClickListener mItemClickListener;
 
-    public ItemAdaptor(Context context, int rowLayout, String[] items, String[] description) {
+    public ItemAdaptor(Context context, int rowLayout, ArrayList<Item>itemset) {
         this.context = context;
         this.rowLayout = rowLayout;
-        this.items = items;
-        this.descriptions = description;
+        this.itemset = itemset;
     }
 
     @Override
@@ -34,15 +34,15 @@ public class ItemAdaptor extends RecyclerView.Adapter<ItemAdaptor.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.itemName.setText(items[position]);
-        holder.itemDescription.setText(descriptions[position]);
-
-
+        if (itemset != null && !itemset.isEmpty()) {
+            holder.itemName.setText(itemset.get(position).getName());
+            holder.itemDescription.setText(itemset.get(position).getDescription());
+        }
     }
 
     @Override
     public int getItemCount() {
-        return items.length;
+        return (itemset == null) ? 0 : itemset.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -59,7 +59,7 @@ public class ItemAdaptor extends RecyclerView.Adapter<ItemAdaptor.ViewHolder> {
         @Override
         public void onClick(View v) {
             if(mItemClickListener != null) {
-                mItemClickListener.onItemClick(v, getPosition());
+                mItemClickListener.onItemClick(v, getLayoutPosition());
             }
         }
     }

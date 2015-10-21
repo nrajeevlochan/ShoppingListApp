@@ -12,12 +12,15 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+
 public class ItemListDisplayActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private ItemAdaptor mItemAdaptor;
-    String[] items = {"first", "Second", "Third", "fourth"};
-    String[] descriptions = {"first string", "Second string", "Third string", "fourth string"};
+    //String[] items = {"first", "Second", "Third", "fourth"};
+    //String[] descriptions = {"first string", "Second string", "Third string", "fourth string"};
+    private ArrayList<Item> itemset = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +38,13 @@ public class ItemListDisplayActivity extends AppCompatActivity {
             }
         });
 
+        itemset = new ArrayList<Item>();
+
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, items, descriptions);
+        mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, itemset);
         mRecyclerView.setAdapter(mItemAdaptor);
     }
 
