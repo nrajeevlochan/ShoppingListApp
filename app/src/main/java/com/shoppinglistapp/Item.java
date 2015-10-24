@@ -7,8 +7,17 @@ import android.os.Parcelable;
  * Created by r.nalluru on 10/20/15.
  */
 public class Item implements Parcelable {
+    private int id;
     private String name;
     private String description;
+
+    public Item(){}
+
+    public Item(int id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
 
     public Item(String name, String description) {
         this.name = name;
@@ -16,9 +25,14 @@ public class Item implements Parcelable {
     }
 
     public Item(Parcel parcel) {
+        this.id = parcel.readInt();
         this.name = parcel.readString();
         this.description = parcel.readString();
     }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 
     public String getName() {
         return name;
@@ -43,11 +57,12 @@ public class Item implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(getId());
         dest.writeString(getName());
         dest.writeString(getDescription());
     }
 
-    public static final Parcelable.Creator<Item> CREATER = new Creator<Item>() {
+    public static final Parcelable.Creator<Item> CREATOR = new Creator<Item>() {
         @Override
         public Item createFromParcel(Parcel source) {
             return new Item(source);

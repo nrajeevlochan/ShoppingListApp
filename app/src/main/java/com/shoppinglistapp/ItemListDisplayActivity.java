@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,21 +14,19 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class ItemListDisplayActivity extends AppCompatActivity implements ItemInputDialog.NoticeDialogListener {
+public class ItemListDisplayActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener {
 
     private static final int ACTION_EDIT = 0;
     private static final int ACTION_DELETE = 1;
-    private static final String DIALOG_TAG = "ItemInputDialog";
 
     private RecyclerView mRecyclerView;
     private ItemAdaptor mItemAdaptor;
     private ArrayList<Item> itemset = null;
-    private DialogFragment mItemDialog;
     private int mEditItemIndex = -1;
+    private ItemDbAdapter mItemDbAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,27 +39,25 @@ public class ItemListDisplayActivity extends AppCompatActivity implements ItemIn
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mItemDialog.show(getFragmentManager(), DIALOG_TAG);
+                Utils.showDialog(ItemListDisplayActivity.this,Constants.ITEM_INPUT_DIALOG , null);
             }
         });
 
-        itemset = new ArrayList<>();
+        mItemDbAdapter = new ItemDbAdapter(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        if (savedInstanceState == null) {
+        if (mItemDbAdapter.getItemCount() == 0) {
             itemset = new ArrayList<>();
         } else {
-            itemset = savedInstanceState.getParcelableArrayList("persistData");
+            itemset = (ArrayList<Item>) mItemDbAdapter.getAllItem();
+
         }
 
         mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, itemset);
         mRecyclerView.setAdapter(mItemAdaptor);
-
-        // Create an instance of the dialog fragment and show it
-        mItemDialog = new ItemInputDialog();
 
         // Add onclick listener
         mItemAdaptor.SetOnItemClickListener(new ItemAdaptor.OnItemClickListener() {
@@ -72,12 +67,11 @@ public class ItemListDisplayActivity extends AppCompatActivity implements ItemIn
                 if (itemset != null && !itemset.isEmpty()) {
                     switch (actionType) {
                         case ACTION_EDIT:
-                            mItemDialog.show(getFragmentManager(), DIALOG_TAG);
-                            //((EditText)(mItemDialog.getDialog()).findViewById(R.id.dialog_item_name)).setText(itemset.get(position).getName());
-                            //((EditText)(mItemDialog.getDialog()).findViewById(R.id.dialog_item_desc)).setText(itemset.get(position).getDescription());
+                            Utils.showDialog(ItemListDisplayActivity.this, Constants.ITEM_INPUT_DIALOG, itemset.get(position));
                             setEditItemIndex(position);
                             break;
                         case ACTION_DELETE:
+                            mItemDbAdapter.deleteItem(itemset.get(position));
                             itemset.remove(position);
                             mItemAdaptor.notifyDataSetChanged();
                             break;
@@ -94,9 +88,9 @@ public class ItemListDisplayActivity extends AppCompatActivity implements ItemIn
         ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
             @Override
             public void onItemSwipe(int position) {
+                mItemDbAdapter.deleteItem(itemset.get(position));
                 itemset.remove(position);
                 mItemAdaptor.notifyDataSetChanged();
-                //Toast.makeText(MainActivity.this, "position: " + position, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -104,7 +98,6 @@ public class ItemListDisplayActivity extends AppCompatActivity implements ItemIn
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("persistData", itemset);
     }
 
     @Override
@@ -123,7 +116,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements ItemIn
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
-            mItemDialog.show(getFragmentManager(), DIALOG_TAG);
+            Utils.showDialog(this, Constants.ITEM_INPUT_DIALOG, null);
             return true;
         }
 
@@ -138,10 +131,12 @@ public class ItemListDisplayActivity extends AppCompatActivity implements ItemIn
         int index = getEditItemIndex();
         if (index == -1) {
             Item item = new Item(stringName, stringDescription);
+            mItemDbAdapter.insertItem(item);
             itemset.add(item);
         } else {
             itemset.get(index).setName(stringName);
             itemset.get(index).setDescription(stringDescription);
+            mItemDbAdapter.updateItem(itemset.get(index));
             setEditItemIndex(-1);
         }
         mItemAdaptor.notifyDataSetChanged();
