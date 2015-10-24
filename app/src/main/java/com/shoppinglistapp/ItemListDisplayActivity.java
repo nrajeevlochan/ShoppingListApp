@@ -2,7 +2,9 @@ package com.shoppinglistapp;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,6 +31,26 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
     private ItemDbAdapter mItemDbAdapter;
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String stringName;
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case 0:
+                if (resultCode == RESULT_OK && data != null) {
+                    ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    stringName = text.get(0);
+                    if (stringName != null) {
+                        Item item = new Item(stringName, "");
+                        mItemDbAdapter.insertItem(item);
+                        itemset.add(item);
+                        mItemAdaptor.notifyDataSetChanged();
+                    }
+                }
+                break;
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list_display);
@@ -39,7 +61,19 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Utils.showDialog(ItemListDisplayActivity.this,Constants.ITEM_INPUT_DIALOG , null);
+                Utils.showDialog(ItemListDisplayActivity.this, Constants.ITEM_INPUT_DIALOG, null);
+            }
+        });
+
+        FloatingActionButton fabVoice = (FloatingActionButton) findViewById(R.id.fab_voice);
+        fabVoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Utils.showDialog(ItemListDisplayActivity.this,Constants.ITEM_INPUT_DIALOG , null);
+                Intent intent = new Intent(
+                        RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+                startActivityForResult(intent, 0);
             }
         });
 
