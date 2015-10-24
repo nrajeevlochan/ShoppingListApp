@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,34 +22,16 @@ import java.util.ArrayList;
 
 public class ItemListDisplayActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener {
 
+    private static final String LOG_TAG = "ItemListDisplayActivity";
     private static final int ACTION_EDIT = 0;
     private static final int ACTION_DELETE = 1;
+    private static final int RESULT_SPEECH_OUTPUT = 0;
 
     private RecyclerView mRecyclerView;
     private ItemAdaptor mItemAdaptor;
     private ArrayList<Item> itemset = null;
     private int mEditItemIndex = -1;
     private ItemDbAdapter mItemDbAdapter;
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String stringName;
-        super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case 0:
-                if (resultCode == RESULT_OK && data != null) {
-                    ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    stringName = text.get(0);
-                    if (stringName != null) {
-                        Item item = new Item(stringName, "");
-                        mItemDbAdapter.insertItem(item);
-                        itemset.add(item);
-                        mItemAdaptor.notifyDataSetChanged();
-                    }
-                }
-                break;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,11 +52,10 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         fabVoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Utils.showDialog(ItemListDisplayActivity.this,Constants.ITEM_INPUT_DIALOG , null);
                 Intent intent = new Intent(
                         RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
-                startActivityForResult(intent, 0);
+                startActivityForResult(intent, RESULT_SPEECH_OUTPUT);
             }
         });
 
@@ -130,11 +112,6 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_item_list_display, menu);
@@ -187,5 +164,28 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
 
     private void setEditItemIndex(int editItemIndex) {
         this.mEditItemIndex = editItemIndex;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String stringName;
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case RESULT_SPEECH_OUTPUT:
+                if (resultCode == RESULT_OK && data != null) {
+                    ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    stringName = text.get(0);
+                    if (stringName != null) {
+                        Item item = new Item(stringName, "");
+                        mItemDbAdapter.insertItem(item);
+                        itemset.add(item);
+                        mItemAdaptor.notifyDataSetChanged();
+                    }
+                }
+                break;
+            default:
+                Log.w(LOG_TAG, "Not handled speech resultCode");
+                break;
+        }
     }
 }
