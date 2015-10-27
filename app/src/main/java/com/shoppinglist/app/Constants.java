@@ -9,5 +9,6 @@ public class Constants {
     public static final String DIALOG_INPUT_KEY = "DialogInputKey";
     public static final String ITEM_INPUT_DIALOG = "item";
     public static final String STORE_INPUT_DIALOG = "store";
+    public static final int RESULT_SPEECH_OUTPUT = 0;
 
 }

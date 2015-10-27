@@ -70,7 +70,7 @@ public class ItemDbAdapter extends DataBaseAdapter {
     }
 
     // Getting items Count
-    public int getItemCount(int index) {
+    public int getItemCount(long index) {
         String[] args = {String.valueOf(index)};
         String countQuery = "SELECT  * FROM " + DataBaseHelper.TABLE_ITEMS + " WHERE " + DataBaseHelper.KEY_ARRAY_ID + " = ?";
         Cursor cursor = database.rawQuery(countQuery, args);
@@ -82,7 +82,7 @@ public class ItemDbAdapter extends DataBaseAdapter {
     }
 
     // code to get all contacts in a list view
-    public List<Item> getAllItem(int index) {
+    public List<Item> getAllItem(long index) {
         List<Item> itemList = new ArrayList<>();
         String[] args = {String.valueOf(index)};
         // Select All Query

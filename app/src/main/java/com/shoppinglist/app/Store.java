@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by r.nalluru on 10/23/15.
  */
 public class Store implements Parcelable {
-    private int id;
+    private long id;
     private String name;
 
     public Store() {}
@@ -16,7 +16,7 @@ public class Store implements Parcelable {
         this.name = name;
     }
 
-    public Store(int id, String name) {
+    public Store(long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -38,9 +38,9 @@ public class Store implements Parcelable {
         }
     };
 
-    public int getId() { return id; }
+    public long getId() { return id; }
 
-    public void setId(int id) { this.id = id; }
+    public void setId(long id) { this.id = id; }
 
     public String getName() {
         return name;
@@ -57,7 +57,7 @@ public class Store implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(getId());
+        dest.writeLong(getId());
         dest.writeString(getName());
     }
 }

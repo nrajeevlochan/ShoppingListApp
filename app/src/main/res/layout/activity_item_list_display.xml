@@ -22,9 +22,4 @@
         android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_input_add" />
 
-    <android.support.design.widget.FloatingActionButton android:id="@+id/fab_voice"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start" android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_btn_speak_now" />
-
 </android.support.design.widget.CoordinatorLayout>
