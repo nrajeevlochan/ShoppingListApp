@@ -1,4 +1,4 @@
-package com.shoppinglistapp;
+package com.shoppinglist.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,8 +8,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
+
+import com.shoppinglist.R;
 
 /**
  * Created by r.nalluru on 10/20/15.
@@ -26,11 +27,21 @@ public class PopUpInputDialog extends DialogFragment {
 
     public static PopUpInputDialog newInstance(String diaplayDialogType, Object obj) {
         PopUpInputDialog popUpInputDialog = new PopUpInputDialog();
-        Item item = (Item) obj;
-        if (item != null) {
+        if (diaplayDialogType != null && diaplayDialogType.equals("item")) {
+            Item item = (Item) obj;
             Bundle args = new Bundle();
             args.putString(Constants.DIALOG_TYPE_KEY, diaplayDialogType);
-            args.putParcelable(Constants.DIALOG_INPUT_KEY, item);
+            if (item != null) {
+                args.putParcelable(Constants.DIALOG_INPUT_KEY, item);
+            }
+            popUpInputDialog.setArguments(args);
+        } else {
+            Store store = (Store) obj;
+            Bundle args = new Bundle();
+            args.putString(Constants.DIALOG_TYPE_KEY, diaplayDialogType);
+            if (store != null) {
+                args.putParcelable(Constants.DIALOG_INPUT_KEY, store);
+            }
             popUpInputDialog.setArguments(args);
         }
         return popUpInputDialog;
@@ -62,15 +73,34 @@ public class PopUpInputDialog extends DialogFragment {
 
         Bundle bundle = getArguments();
         Item item = null;
+        Store store = null;
+        String val = null;
         if (bundle != null) {
-            item = bundle.getParcelable(Constants.DIALOG_INPUT_KEY);
+            val = (String) bundle.get(Constants.DIALOG_TYPE_KEY);
+            if (val.equals("item")) {
+                item = bundle.getParcelable(Constants.DIALOG_INPUT_KEY);
+            } else {
+                store = bundle.getParcelable(Constants.DIALOG_INPUT_KEY);
+            }
         }
 
         if (builder != null && inflater != null) {
-            View dialogView = inflater.inflate(R.layout.dialog_input, null);
-            if (item != null) {
-                ((EditText) dialogView.findViewById(R.id.dialog_item_name)).setText(item.getName());
-                ((EditText) dialogView.findViewById(R.id.dialog_item_desc)).setText(item.getDescription());
+            View dialogView;
+            if (val != null && val.equals("item")) {
+                dialogView = inflater.inflate(R.layout.dialog_input, null);
+            } else {
+                dialogView = inflater.inflate(R.layout.store_dialog_layout, null);
+            }
+
+            if (val != null && val.equals("item")) {
+                if (item != null) {
+                    ((EditText) dialogView.findViewById(R.id.dialog_item_name)).setText(item.getName());
+                    ((EditText) dialogView.findViewById(R.id.dialog_item_desc)).setText(item.getDescription());
+                }
+            } else {
+                if (store != null) {
+                    ((EditText) dialogView.findViewById(R.id.dialog_item_name)).setText(store.getName());
+                }
             }
             builder.setView(dialogView)
                     .setTitle(R.string.dialog_title)

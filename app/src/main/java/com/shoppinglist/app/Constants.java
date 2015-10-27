@@ -1,4 +1,4 @@
-package com.shoppinglistapp;
+package com.shoppinglist.app;
 
 /**
  * Created by r.nalluru on 10/23/15.
@@ -8,5 +8,6 @@ public class Constants {
     public static final String DIALOG_TAG = "PopUpInputDialog";
     public static final String DIALOG_INPUT_KEY = "DialogInputKey";
     public static final String ITEM_INPUT_DIALOG = "item";
+    public static final String STORE_INPUT_DIALOG = "store";
 
 }

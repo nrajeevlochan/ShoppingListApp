@@ -1,4 +1,4 @@
-package com.shoppinglistapp;
+package com.shoppinglist.app;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -18,6 +18,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.shoppinglist.R;
+import com.shoppinglist.db.ItemDbAdapter;
+
 import java.util.ArrayList;
 
 public class ItemListDisplayActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener {
@@ -32,6 +35,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
     private ArrayList<Item> itemset = null;
     private int mEditItemIndex = -1;
     private ItemDbAdapter mItemDbAdapter;
+    private int mArrayIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,16 +63,18 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             }
         });
 
+        mArrayIndex = getIntent().getIntExtra("array", -1);
+
         mItemDbAdapter = new ItemDbAdapter(this);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        if (mItemDbAdapter.getItemCount() == 0) {
+        if (mItemDbAdapter.getItemCount(mArrayIndex) == 0) {
             itemset = new ArrayList<>();
         } else {
-            itemset = (ArrayList<Item>) mItemDbAdapter.getAllItem();
+            itemset = (ArrayList<Item>) mItemDbAdapter.getAllItem(mArrayIndex);
 
         }
 
@@ -98,7 +104,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             }
         });
 
-        ItemTouchHelper.Callback callback = new ItemMyTouchHelper(mItemAdaptor);
+        ItemTouchHelper.Callback callback = new ItemMyTouchHelper();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
         ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
@@ -141,7 +147,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         String stringDescription = ((EditText) dialogView.findViewById(R.id.dialog_item_desc)).getText().toString();
         int index = getEditItemIndex();
         if (index == -1) {
-            Item item = new Item(stringName, stringDescription);
+            Item item = new Item(mArrayIndex, stringName, stringDescription);
             mItemDbAdapter.insertItem(item);
             itemset.add(item);
         } else {

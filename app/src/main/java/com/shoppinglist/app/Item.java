@@ -1,25 +1,33 @@
-package com.shoppinglistapp;
+package com.shoppinglist.app;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by r.nalluru on 10/20/15.
+ * Created by ${} on 10/20/15.
  */
 public class Item implements Parcelable {
     private int id;
+    private int array_id;
     private String name;
     private String description;
 
     public Item(){}
 
-    public Item(int id, String name, String description) {
+    public Item(int id, int array_id, String name, String description) {
         this.id = id;
+        this.array_id = array_id;
         this.name = name;
         this.description = description;
     }
 
     public Item(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Item(int array_id, String name, String description) {
+        this.array_id = array_id;
         this.name = name;
         this.description = description;
     }
@@ -32,7 +40,11 @@ public class Item implements Parcelable {
 
     public int getId() { return id; }
 
+    public int getArrayId() { return array_id; }
+
     public void setId(int id) { this.id = id; }
+
+    public void setArrayId(int array_id) { this.array_id = array_id; }
 
     public String getName() {
         return name;

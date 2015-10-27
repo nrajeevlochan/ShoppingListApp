@@ -1,14 +1,12 @@
-package com.shoppinglistapp;
+package com.shoppinglist.app;
 
 import android.support.v7.widget.RecyclerView;
-
-import com.shoppinglistapp.ItemAdaptor;
 
 /**
  * Created by r.nalluru on 10/19/15.
  */
 public class ItemMyTouchHelper extends android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback {
-    private ItemAdaptor mItemAdaptor;
+    //private ItemAdaptor mItemAdaptor;
     private OnItemSwipeListener mItemSwipeListener;
     /**
      * Creates a Callback for the given drag and swipe allowance. These values serve as
@@ -18,9 +16,9 @@ public class ItemMyTouchHelper extends android.support.v7.widget.helper.ItemTouc
      * and / or .
      *
      */
-    public ItemMyTouchHelper(ItemAdaptor itemAdaptor) {
+    public ItemMyTouchHelper() {
         super(0, android.support.v7.widget.helper.ItemTouchHelper.LEFT | android.support.v7.widget.helper.ItemTouchHelper.RIGHT);
-        this.mItemAdaptor = itemAdaptor;
+        //this.mItemAdaptor = itemAdaptor;
     }
 
     @Override

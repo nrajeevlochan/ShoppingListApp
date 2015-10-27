@@ -1,4 +1,4 @@
-package com.shoppinglistapp;
+package com.shoppinglist.app;
 
 import android.app.Activity;
 import android.app.DialogFragment;
