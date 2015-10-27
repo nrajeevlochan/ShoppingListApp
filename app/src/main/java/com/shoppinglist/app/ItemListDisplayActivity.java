@@ -28,17 +28,16 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
     private static final String LOG_TAG = "ItemListDisplayActivity";
     private static final int ACTION_EDIT = 0;
     private static final int ACTION_DELETE = 1;
-    private static final int RESULT_SPEECH_OUTPUT = 0;
 
-    private RecyclerView mRecyclerView;
     private ItemAdaptor mItemAdaptor;
     private ArrayList<Item> itemset = null;
     private int mEditItemIndex = -1;
     private ItemDbAdapter mItemDbAdapter;
-    private int mArrayIndex = -1;
+    private long mArrayIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        RecyclerView recyclerView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list_display);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -52,24 +51,16 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             }
         });
 
-        FloatingActionButton fabVoice = (FloatingActionButton) findViewById(R.id.fab_voice);
-        fabVoice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(
-                        RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
-                startActivityForResult(intent, RESULT_SPEECH_OUTPUT);
-            }
-        });
+        mArrayIndex = getIntent().getLongExtra("array", -1);
+        setTitle(getIntent().getStringExtra("title"));
 
-        mArrayIndex = getIntent().getIntExtra("array", -1);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mItemDbAdapter = new ItemDbAdapter(this);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         if (mItemDbAdapter.getItemCount(mArrayIndex) == 0) {
             itemset = new ArrayList<>();
@@ -79,7 +70,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         }
 
         mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, itemset);
-        mRecyclerView.setAdapter(mItemAdaptor);
+        recyclerView.setAdapter(mItemAdaptor);
 
         // Add onclick listener
         mItemAdaptor.SetOnItemClickListener(new ItemAdaptor.OnItemClickListener() {
@@ -106,7 +97,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
 
         ItemTouchHelper.Callback callback = new ItemMyTouchHelper();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(mRecyclerView);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
         ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
             @Override
             public void onItemSwipe(int position) {
@@ -133,8 +124,13 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add) {
-            Utils.showDialog(this, Constants.ITEM_INPUT_DIALOG, null);
+            Intent intent = new Intent(
+                    RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+            startActivityForResult(intent, Constants.RESULT_SPEECH_OUTPUT);
             return true;
+        } else if (id == android.R.id.home) {
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -177,12 +173,12 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         String stringName;
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
-            case RESULT_SPEECH_OUTPUT:
+            case Constants.RESULT_SPEECH_OUTPUT:
                 if (resultCode == RESULT_OK && data != null) {
                     ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     stringName = text.get(0);
-                    if (stringName != null) {
-                        Item item = new Item(stringName, "");
+                    if (stringName != null && !stringName.isEmpty()) {
+                        Item item = new Item(mArrayIndex, stringName, "");
                         mItemDbAdapter.insertItem(item);
                         itemset.add(item);
                         mItemAdaptor.notifyDataSetChanged();

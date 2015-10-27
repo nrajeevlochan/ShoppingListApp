@@ -77,7 +77,7 @@ public class PopUpInputDialog extends DialogFragment {
         String val = null;
         if (bundle != null) {
             val = (String) bundle.get(Constants.DIALOG_TYPE_KEY);
-            if (val.equals("item")) {
+            if (val != null && val.equals("item")) {
                 item = bundle.getParcelable(Constants.DIALOG_INPUT_KEY);
             } else {
                 store = bundle.getParcelable(Constants.DIALOG_INPUT_KEY);
@@ -99,7 +99,7 @@ public class PopUpInputDialog extends DialogFragment {
                 }
             } else {
                 if (store != null) {
-                    ((EditText) dialogView.findViewById(R.id.dialog_item_name)).setText(store.getName());
+                    ((EditText) dialogView.findViewById(R.id.dialog_store_name)).setText(store.getName());
                 }
             }
             builder.setView(dialogView)

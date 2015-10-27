@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -11,6 +12,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -36,7 +40,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
         RecyclerView recyclerView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.store_toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -81,6 +85,33 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_store_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_store) {
+            //Utils.showDialog(this, Constants.ITEM_INPUT_DIALOG, null);
+            Intent intent = new Intent(
+                    RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+            startActivityForResult(intent, Constants.RESULT_SPEECH_OUTPUT);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         Dialog dialogView = dialog.getDialog();
         String stringName = ((EditText) dialogView.findViewById(R.id.dialog_store_name)).getText().toString();
@@ -117,7 +148,34 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
     @Override
     public void onItemClick(int position) {
         Intent intent = new Intent(this, ItemListDisplayActivity.class);
+        Log.d(LOG_TAG, "onItemClick" + storeList.get(position).getId());
         intent.putExtra("array", storeList.get(position).getId());
+        intent.putExtra("title", storeList.get(position).getName());
         startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String stringName;
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case Constants.RESULT_SPEECH_OUTPUT:
+                if (resultCode == RESULT_OK && data != null) {
+                    ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    stringName = text.get(0);
+                    if (stringName != null && !stringName.isEmpty()) {
+                        Store store = new Store(stringName);
+                        long rowId = mStoreDbAdapter.insertStore(store);
+                        Log.d(LOG_TAG, "Insert ret val: " + rowId);
+                        store.setId(rowId);
+                        storeList.add(store);
+                        mStoreAdaptor.notifyDataSetChanged();
+                    }
+                }
+                break;
+            default:
+                Log.w(LOG_TAG, "Not handled speech resultCode");
+                break;
+        }
     }
 }

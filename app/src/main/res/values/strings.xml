@@ -7,5 +7,5 @@
     <string name="cancel">cancel</string>
     <string name="dialog_title">Add Items</string>
     <string name="store_name">store name</string>
-    <string name="title_activity_store">Shopping List</string>
+    <string name="title_activity_store">List Manager</string>
 </resources>

@@ -20,12 +20,12 @@ public class StoreDbAdapter extends DataBaseAdapter {
     }
 
     // code to add the new item
-    public void insertStore(Store store) {
+    public long insertStore(Store store) {
         ContentValues values = new ContentValues();
         values.put(DataBaseHelper.KEY_NAME, store.getName());
 
         // Inserting Row
-        database.insert(DataBaseHelper.TABLE_STORE, null, values);
+        return database.insert(DataBaseHelper.TABLE_STORE, null, values);
         //2nd argument is String containing nullColumnHack
         //database.close(); // Closing database connection
     }
@@ -52,7 +52,7 @@ public class StoreDbAdapter extends DataBaseAdapter {
     }
 
     // code to get the single item
-    Store getStore(int id) {
+    public Store getStore(int id) {
         Cursor cursor = database.query(DataBaseHelper.TABLE_STORE, new String[]{DataBaseHelper.KEY_ID,
                         DataBaseHelper.KEY_NAME}, DataBaseHelper.KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
@@ -101,7 +101,7 @@ public class StoreDbAdapter extends DataBaseAdapter {
         return storeList;
     }
 
-    public void deleteItems(int index) {
+    public void deleteItems(long index) {
         String[] args = {String.valueOf(index)};
         // Select All Query
         String selectQuery = "SELECT  * FROM " + DataBaseHelper.TABLE_ITEMS + " WHERE " + DataBaseHelper.KEY_ARRAY_ID + " = ?";
