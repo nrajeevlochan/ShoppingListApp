@@ -20,7 +20,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.shoppinglist.R;
-import com.shoppinglist.db.ItemDbAdapter;
 import com.shoppinglist.db.StoreDbAdapter;
 
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_store_list, menu);
+        getMenuInflater().inflate(R.menu.menu_item_list_display, menu);
         return true;
     }
 
@@ -99,7 +98,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_store) {
+        if (id == R.id.action_add) {
             //Utils.showDialog(this, Constants.ITEM_INPUT_DIALOG, null);
             Intent intent = new Intent(
                     RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
