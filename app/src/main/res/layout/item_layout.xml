@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:layout_margin="5dp"
     android:orientation="horizontal"
+    card_view:cardBackgroundColor="#EDD3C4"
     card_view:cardCornerRadius="5dp">
 
     <RelativeLayout
@@ -13,19 +14,17 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/item_name"
             android:layout_alignParentTop="true"
-            android:textSize="30sp"
-            />
+            android:textSize="30sp" />
 
         <TextView
+            android:id="@+id/item_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/item_desc"
-            android:layout_below="@+id/item_name"
-            />
+            android:layout_below="@+id/item_name" />
 
     </RelativeLayout>
 
