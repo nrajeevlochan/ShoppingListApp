@@ -9,16 +9,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.shoppinglist.app.ItemListDisplayActivity"
+            android:name=".app.ItemListDisplayActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
             </intent-filter>
         </activity>
         <activity
-            android:name="com.shoppinglist.app.StoreListActivity"
+            android:name=".app.StoreListActivity"
             android:label="@string/title_activity_store"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -27,6 +26,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".app.Notifi"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

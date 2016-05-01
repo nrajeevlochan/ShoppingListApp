@@ -1,11 +1,13 @@
 package com.shoppinglist.app;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,7 +56,10 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         mArrayIndex = getIntent().getLongExtra("array", -1);
         setTitle(getIntent().getStringExtra("title"));
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         mItemDbAdapter = new ItemDbAdapter(this);
 
@@ -131,6 +136,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             return true;
         } else if (id == android.R.id.home) {
             finish();
+            //NavUtils.navigateUpFromSameTask();
         }
 
         return super.onOptionsItemSelected(item);

@@ -1,7 +1,9 @@
 package com.shoppinglist.app;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -107,6 +109,12 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
             startActivityForResult(intent, Constants.RESULT_SPEECH_OUTPUT);
             return true;
         }
+        /*else if (id == R.id.action_alarm) {
+//            AlarmManager alarmManager = (AlarmManager) getBaseContext().getSystemService(ALARM_SERVICE);
+//            Intent intent = new Intent(Notifi.class);
+//            PendingIntent pendingIntent = PendingIntent.getService(this, 0, )
+//            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, );
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -118,7 +126,8 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
         if (editIndex == -1) {
             if (!stringName.isEmpty()) {
                 Store store = new Store(stringName);
-                mStoreDbAdapter.insertStore(store);
+                long rowId = mStoreDbAdapter.insertStore(store);
+                store.setId(rowId);
                 storeList.add(store);
             }
         } else {
