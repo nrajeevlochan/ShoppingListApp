@@ -15,6 +15,9 @@ import java.util.List;
  */
 public class StoreDbAdapter extends DataBaseAdapter {
 
+    private static final int KEY_ID = 0;
+    private static final int NAME = 2;
+
     public StoreDbAdapter(Context context) {
         super(context);
     }
@@ -26,8 +29,6 @@ public class StoreDbAdapter extends DataBaseAdapter {
 
         // Inserting Row
         return database.insert(DataBaseHelper.TABLE_STORE, null, values);
-        //2nd argument is String containing nullColumnHack
-        //database.close(); // Closing database connection
     }
 
     // code to update the single item
@@ -35,7 +36,6 @@ public class StoreDbAdapter extends DataBaseAdapter {
         Log.d("ItemDbAdapter", "Update item: " + store.getName() + " " + store.getId());
         ContentValues values = new ContentValues();
         values.put(DataBaseHelper.KEY_NAME, store.getName());
-        //values.put(DataBaseHelper.KEY_DESCRIPTION, item.getDescription());
 
         // updating row
         return database.update(DataBaseHelper.TABLE_STORE, values, DataBaseHelper.KEY_ID + " = ?",
@@ -47,8 +47,6 @@ public class StoreDbAdapter extends DataBaseAdapter {
         deleteItems(store.getId());
         database.delete(DataBaseHelper.TABLE_STORE, DataBaseHelper.KEY_ID + " = ?",
                 new String[]{String.valueOf(store.getId())});
-
-        //database.close();
     }
 
     // code to get the single item
@@ -60,8 +58,8 @@ public class StoreDbAdapter extends DataBaseAdapter {
         if (cursor != null) {
             cursor.moveToFirst();
 
-            store = new Store(Integer.parseInt(cursor.getString(0)),
-                    cursor.getString(1));
+            store = new Store(Integer.parseInt(cursor.getString(KEY_ID)),
+                    cursor.getString(NAME));
         }
         // return contact
         return store;
@@ -90,8 +88,8 @@ public class StoreDbAdapter extends DataBaseAdapter {
         if (cursor.moveToFirst()) {
             do {
                 Store store = new Store();
-                store.setId(Integer.parseInt(cursor.getString(0)));
-                store.setName(cursor.getString(1));
+                store.setId(Integer.parseInt(cursor.getString(KEY_ID)));
+                store.setName(cursor.getString(NAME));
                 // Adding contact to list
                 storeList.add(store);
             } while (cursor.moveToNext());

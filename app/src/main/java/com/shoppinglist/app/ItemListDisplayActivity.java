@@ -53,8 +53,10 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             }
         });
 
-        mArrayIndex = getIntent().getLongExtra("array", -1);
-        setTitle(getIntent().getStringExtra("title"));
+        Bundle bundle = getIntent().getExtras();
+        Store store = (Store) bundle.getParcelable(Constants.STORE_ITEM_KEY);
+        mArrayIndex = store.getId();
+        setTitle(store.getName());
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

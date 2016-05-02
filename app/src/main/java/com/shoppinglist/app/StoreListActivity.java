@@ -157,8 +157,9 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
     public void onItemClick(int position) {
         Intent intent = new Intent(this, ItemListDisplayActivity.class);
         Log.d(LOG_TAG, "onItemClick" + storeList.get(position).getId());
-        intent.putExtra("array", storeList.get(position).getId());
-        intent.putExtra("title", storeList.get(position).getName());
+        //intent.putExtra("array", storeList.get(position).getId());
+        //intent.putExtra("title", storeList.get(position).getName());
+        intent.putExtra(Constants.STORE_ITEM_KEY, storeList.get(position));
         startActivity(intent);
     }
 

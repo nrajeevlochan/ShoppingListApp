@@ -15,6 +15,12 @@ import java.util.List;
  */
 public class ItemDbAdapter extends DataBaseAdapter {
 
+    private static final int KEY_ID = 0;
+    private static final int ARRAY_ID = 1;
+    private static final int NAME = 2;
+    private static final int DESCRIPTION = 3;
+
+
     public ItemDbAdapter(Context context) {
         super(context);
     }
@@ -28,8 +34,6 @@ public class ItemDbAdapter extends DataBaseAdapter {
 
         // Inserting Row
         database.insert(DataBaseHelper.TABLE_ITEMS, null, values);
-        //2nd argument is String containing nullColumnHack
-        //database.close(); // Closing database connection
     }
 
     // code to update the single item
@@ -49,7 +53,6 @@ public class ItemDbAdapter extends DataBaseAdapter {
     public void deleteItem(Item item) {
         database.delete(DataBaseHelper.TABLE_ITEMS, DataBaseHelper.KEY_ID + " = ?",
                 new String[]{String.valueOf(item.getId())});
-        //database.close();
     }
 
     // code to get the single item
@@ -62,8 +65,8 @@ public class ItemDbAdapter extends DataBaseAdapter {
         if (cursor != null) {
             cursor.moveToFirst();
 
-            item = new Item(Integer.parseInt(cursor.getString(0)), Integer.parseInt(cursor.getString(1)),
-                    cursor.getString(2), cursor.getString(3));
+            item = new Item(Integer.parseInt(cursor.getString(KEY_ID)), Integer.parseInt(cursor.getString(ARRAY_ID)),
+                    cursor.getString(NAME), cursor.getString(DESCRIPTION));
         }
         // return contact
         return item;
@@ -94,10 +97,10 @@ public class ItemDbAdapter extends DataBaseAdapter {
         if (cursor.moveToFirst()) {
             do {
                 Item item = new Item();
-                item.setId(Integer.parseInt(cursor.getString(0)));
-                item.setArrayId(Integer.parseInt(cursor.getString(1)));
-                item.setName(cursor.getString(2));
-                item.setDescription(cursor.getString(3));
+                item.setId(Integer.parseInt(cursor.getString(KEY_ID)));
+                item.setArrayId(Integer.parseInt(cursor.getString(ARRAY_ID)));
+                item.setName(cursor.getString(NAME));
+                item.setDescription(cursor.getString(DESCRIPTION));
                 // Adding contact to list
                 itemList.add(item);
             } while (cursor.moveToNext());
