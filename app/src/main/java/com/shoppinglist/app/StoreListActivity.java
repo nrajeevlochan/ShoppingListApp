@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class StoreListActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener, StoreAdapter.OnItemClickListener {
 
     private static final String LOG_TAG = "StoreListActivitytype";
-    private ArrayList<Store> storeList;
+    private ArrayList<Store> mStoreList;
     private StoreAdapter mStoreAdaptor;
     private DialogFragment mStoreDialog;
     private int editIndex = -1;
@@ -58,14 +58,11 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        storeList = new ArrayList<>();
-        if (mStoreDbAdapter.getStoreCount() == 0) {
-            storeList = new ArrayList<>();
-        } else {
-            storeList = (ArrayList<Store>) mStoreDbAdapter.getAllStore();
-        }
+        mStoreList = new ArrayList<>();
+        mStoreList = (mStoreDbAdapter.getStoreCount() == 0) ? new ArrayList<Store>()
+                :(ArrayList<Store>) mStoreDbAdapter.getAllStore();
 
-        mStoreAdaptor = new StoreAdapter(this, R.layout.store_layout, storeList);
+        mStoreAdaptor = new StoreAdapter(this, R.layout.store_layout, mStoreList);
         recyclerView.setAdapter(mStoreAdaptor);
 
         // Create an instance of the dialog fragment and show it
@@ -77,8 +74,8 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
         ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
             @Override
             public void onItemSwipe(int position) {
-                mStoreDbAdapter.deleteStore(storeList.get(position));
-                storeList.remove(position);
+                mStoreDbAdapter.deleteStore(mStoreList.get(position));
+                mStoreList.remove(position);
                 mStoreAdaptor.notifyDataSetChanged();
                 Toast.makeText(StoreListActivity.this, "position: " + position, Toast.LENGTH_SHORT).show();
             }
@@ -108,12 +105,6 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
             startActivityForResult(intent, Constants.RESULT_SPEECH_OUTPUT);
             return true;
         }
-        /*else if (id == R.id.action_alarm) {
-//            AlarmManager alarmManager = (AlarmManager) getBaseContext().getSystemService(ALARM_SERVICE);
-//            Intent intent = new Intent(Notifi.class);
-//            PendingIntent pendingIntent = PendingIntent.getService(this, 0, )
-//            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, );
-        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -127,11 +118,11 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
                 Store store = new Store(stringName);
                 long rowId = mStoreDbAdapter.insertStore(store);
                 store.setId(rowId);
-                storeList.add(store);
+                mStoreList.add(store);
             }
         } else {
-            storeList.get(editIndex).setName(stringName);
-            mStoreDbAdapter.updateStore(storeList.get(editIndex));
+            mStoreList.get(editIndex).setName(stringName);
+            mStoreDbAdapter.updateStore(mStoreList.get(editIndex));
             editIndex = -1;
         }
 
@@ -147,8 +138,8 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
 
     @Override
     public void onItemLongClick(int position) {
-        if (storeList != null && !storeList.isEmpty()) {
-            Utils.showDialog(StoreListActivity.this, Constants.STORE_INPUT_DIALOG, storeList.get(position));
+        if (mStoreList != null && !mStoreList.isEmpty()) {
+            Utils.showDialog(StoreListActivity.this, Constants.STORE_INPUT_DIALOG, mStoreList.get(position));
             editIndex = position;
         }
     }
@@ -156,10 +147,10 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
     @Override
     public void onItemClick(int position) {
         Intent intent = new Intent(this, ItemListDisplayActivity.class);
-        Log.d(LOG_TAG, "onItemClick" + storeList.get(position).getId());
+        Log.d(LOG_TAG, "onItemClick" + mStoreList.get(position).getId());
         //intent.putExtra("array", storeList.get(position).getId());
         //intent.putExtra("title", storeList.get(position).getName());
-        intent.putExtra(Constants.STORE_ITEM_KEY, storeList.get(position));
+        intent.putExtra(Constants.STORE_ITEM_KEY, mStoreList.get(position));
         startActivity(intent);
     }
 
@@ -177,7 +168,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
                         long rowId = mStoreDbAdapter.insertStore(store);
                         Log.d(LOG_TAG, "Insert ret val: " + rowId);
                         store.setId(rowId);
-                        storeList.add(store);
+                        mStoreList.add(store);
                         mStoreAdaptor.notifyDataSetChanged();
                     }
                 }

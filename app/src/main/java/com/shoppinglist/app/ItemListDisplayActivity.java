@@ -32,7 +32,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
     private static final int ACTION_DELETE = 1;
 
     private ItemAdaptor mItemAdaptor;
-    private ArrayList<Item> itemset = null;
+    private ArrayList<Item> mItemset = null;
     private int mEditItemIndex = -1;
     private ItemDbAdapter mItemDbAdapter;
     private long mArrayIndex = -1;
@@ -55,8 +55,8 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
 
         Bundle bundle = getIntent().getExtras();
         Store store = (Store) bundle.getParcelable(Constants.STORE_ITEM_KEY);
-        mArrayIndex = store.getId();
-        setTitle(store.getName());
+        mArrayIndex = (store == null) ? -1 : store.getId();
+        setTitle((store == null) ? "" : store.getName());
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -69,14 +69,10 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        if (mItemDbAdapter.getItemCount(mArrayIndex) == 0) {
-            itemset = new ArrayList<>();
-        } else {
-            itemset = (ArrayList<Item>) mItemDbAdapter.getAllItem(mArrayIndex);
+        mItemset = (mItemDbAdapter.getItemCount(mArrayIndex) == 0) ? new ArrayList<Item>()
+                :(ArrayList<Item>) mItemDbAdapter.getAllItem(mArrayIndex);
 
-        }
-
-        mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, itemset);
+        mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, mItemset);
         recyclerView.setAdapter(mItemAdaptor);
 
         // Add onclick listener
@@ -84,15 +80,15 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             @Override
             public void onItemClick(int actionType, int position) {
                 // do something with position
-                if (itemset != null && !itemset.isEmpty()) {
+                if (mItemset != null && !mItemset.isEmpty()) {
                     switch (actionType) {
                         case ACTION_EDIT:
-                            Utils.showDialog(ItemListDisplayActivity.this, Constants.ITEM_INPUT_DIALOG, itemset.get(position));
+                            Utils.showDialog(ItemListDisplayActivity.this, Constants.ITEM_INPUT_DIALOG, mItemset.get(position));
                             setEditItemIndex(position);
                             break;
                         case ACTION_DELETE:
-                            mItemDbAdapter.deleteItem(itemset.get(position));
-                            itemset.remove(position);
+                            mItemDbAdapter.deleteItem(mItemset.get(position));
+                            mItemset.remove(position);
                             mItemAdaptor.notifyDataSetChanged();
                             break;
                         default:
@@ -108,8 +104,8 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
             @Override
             public void onItemSwipe(int position) {
-                mItemDbAdapter.deleteItem(itemset.get(position));
-                itemset.remove(position);
+                mItemDbAdapter.deleteItem(mItemset.get(position));
+                mItemset.remove(position);
                 mItemAdaptor.notifyDataSetChanged();
             }
         });
@@ -153,11 +149,11 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         if (index == -1) {
             Item item = new Item(mArrayIndex, stringName, stringDescription);
             mItemDbAdapter.insertItem(item);
-            itemset.add(item);
+            mItemset.add(item);
         } else {
-            itemset.get(index).setName(stringName);
-            itemset.get(index).setDescription(stringDescription);
-            mItemDbAdapter.updateItem(itemset.get(index));
+            mItemset.get(index).setName(stringName);
+            mItemset.get(index).setDescription(stringDescription);
+            mItemDbAdapter.updateItem(mItemset.get(index));
             setEditItemIndex(-1);
         }
         mItemAdaptor.notifyDataSetChanged();
@@ -188,7 +184,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
                     if (stringName != null && !stringName.isEmpty()) {
                         Item item = new Item(mArrayIndex, stringName, "");
                         mItemDbAdapter.insertItem(item);
-                        itemset.add(item);
+                        mItemset.add(item);
                         mItemAdaptor.notifyDataSetChanged();
                     }
                 }

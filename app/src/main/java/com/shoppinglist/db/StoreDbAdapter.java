@@ -16,7 +16,7 @@ import java.util.List;
 public class StoreDbAdapter extends DataBaseAdapter {
 
     private static final int KEY_ID = 0;
-    private static final int NAME = 2;
+    private static final int NAME = 1;
 
     public StoreDbAdapter(Context context) {
         super(context);
