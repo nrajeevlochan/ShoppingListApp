@@ -15,17 +15,25 @@ import java.util.List;
  */
 public class StoreDbAdapter {
 
-    public static final String TABLE_STORE = "store";
-    public static final String KEY_ID = "id";
-    public static final String KEY_NAME = "name";
-    public static final String TABLE_ITEMS = "items";
-    public static final String KEY_ARRAY_ID = "arrayid";
-    public static final String DROP_STORES_TABLE = "DROP TABLE IF EXISTS " + TABLE_STORE;
+    private static final String TABLE_STORE = "store";
+    private static final String KEY_ID = "id";
+    private static final String KEY_NAME = "name";
+    private static final String TABLE_ITEMS = "items";
+    private static final String KEY_ARRAY_ID = "arrayid";
+    private static final String DROP_STORES_TABLE = "DROP TABLE IF EXISTS " + TABLE_STORE;
+    private static StoreDbAdapter mInstance = null;
 
     private static final int KEY_INDEX = 0;
     private static final int NAME_INDEX = 1;
 
-    public StoreDbAdapter() {
+    private StoreDbAdapter() {
+    }
+
+    public static StoreDbAdapter getInstance() {
+        if (mInstance == null) {
+            mInstance = new StoreDbAdapter();
+        }
+        return mInstance;
     }
 
     public static String createTable(){

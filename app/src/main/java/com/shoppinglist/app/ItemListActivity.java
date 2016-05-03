@@ -62,7 +62,7 @@ public class ItemListActivity extends AppCompatActivity implements PopUpInputDia
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        mItemDbAdapter = new ItemDbAdapter();
+        mItemDbAdapter = ItemDbAdapter.getInstance();
 
         recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

@@ -50,7 +50,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
             }
         });
 
-        mStoreDbAdapter = new StoreDbAdapter();
+        mStoreDbAdapter =  StoreDbAdapter.getInstance();
 
         recyclerView = (RecyclerView) findViewById(R.id.store_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

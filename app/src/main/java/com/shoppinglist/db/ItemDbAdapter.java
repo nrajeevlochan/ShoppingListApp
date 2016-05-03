@@ -15,19 +15,28 @@ import java.util.List;
  */
 public class ItemDbAdapter {
 
-    public static final String TABLE_ITEMS = "items";
-    public static final String KEY_ID = "id";
-    public static final String KEY_NAME = "name";
-    public static final String KEY_DESCRIPTION = "description";
-    public static final String KEY_ARRAY_ID = "arrayid";
-    public static final String DROP_ITEMS_TABLE = "DROP TABLE IF EXISTS " + TABLE_ITEMS;
+    private static final String TABLE_ITEMS = "items";
+    private static final String KEY_ID = "id";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_ARRAY_ID = "arrayid";
+    private static final String DROP_ITEMS_TABLE = "DROP TABLE IF EXISTS " + TABLE_ITEMS;
+    private static ItemDbAdapter mInstance = null;
+
 
     private static final int KEY_INDEX = 0;
     private static final int ARRAY_INDEX = 1;
     private static final int NAME_INDEX = 2;
     private static final int DESCRIPTION_INDEX = 3;
 
-    public ItemDbAdapter() {
+    private ItemDbAdapter() {
+    }
+
+    public static ItemDbAdapter getInstance() {
+        if (mInstance == null) {
+            mInstance = new ItemDbAdapter();
+        }
+        return mInstance;
     }
 
     public static String createTable(){
