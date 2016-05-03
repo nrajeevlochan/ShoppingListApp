@@ -2,10 +2,14 @@ package com.shoppinglist.app;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,8 +27,10 @@ import com.shoppinglist.R;
 import com.shoppinglist.db.StoreDbAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class StoreListActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener, StoreAdapter.OnItemClickListener {
+public class StoreListActivity extends AppCompatActivity implements
+        PopUpInputDialog.NoticeDialogListener, StoreAdapter.OnItemClickListener, LoaderManager.LoaderCallbacks {
 
     private static final String LOG_TAG = StoreListActivity.class.getSimpleName();
     private ArrayList<Store> mStoreList;
@@ -33,10 +39,10 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
     private int editIndex = -1;
     private static final int DIAPLAY_ITEM_LIST = 0;
     private StoreDbAdapter mStoreDbAdapter;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        RecyclerView recyclerView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store);
         Toolbar toolbar = (Toolbar) findViewById(R.id.store_toolbar);
@@ -52,32 +58,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
 
         mStoreDbAdapter =  StoreDbAdapter.getInstance();
 
-        recyclerView = (RecyclerView) findViewById(R.id.store_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        mStoreList = new ArrayList<>();
-        mStoreList = (mStoreDbAdapter.getStoreCount() == 0) ? new ArrayList<Store>()
-                :(ArrayList<Store>) mStoreDbAdapter.getAllStore();
-
-        mStoreAdaptor = new StoreAdapter(this, R.layout.store_layout, mStoreList);
-        recyclerView.setAdapter(mStoreAdaptor);
-
-        // Create an instance of the dialog fragment and show it
-        mStoreAdaptor.SetOnItemClickListener(this);
-
-        ItemTouchHelper.Callback callback = new ListItemTouchHelper();
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-        ((ListItemTouchHelper)callback).SetOnItemClickListener(new ListItemTouchHelper.OnItemSwipeListener() {
-            @Override
-            public void onItemSwipe(int position) {
-                mStoreDbAdapter.deleteStore(mStoreList.get(position));
-                mStoreList.remove(position);
-                mStoreAdaptor.notifyDataSetChanged();
-                Toast.makeText(StoreListActivity.this, "position: " + position, Toast.LENGTH_SHORT).show();
-            }
-        });
+        getSupportLoaderManager().initLoader(1, null, this).forceLoad();
     }
 
     @Override
@@ -174,6 +155,56 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
             default:
                 Log.w(LOG_TAG, "Not handled speech resultCode");
                 break;
+        }
+    }
+
+    @Override
+    public Loader<List<Store>> onCreateLoader(int id, Bundle args) {
+        return new StoreLoader(StoreListActivity.this);
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object data) {
+        recyclerView = (RecyclerView) findViewById(R.id.store_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mStoreList = (ArrayList<Store>) data;
+        mStoreAdaptor = new StoreAdapter(this, R.layout.store_layout, mStoreList);
+        recyclerView.setAdapter(mStoreAdaptor);
+
+        // Create an instance of the dialog fragment and show it
+        mStoreAdaptor.SetOnItemClickListener(this);
+
+        ItemTouchHelper.Callback callback = new ListItemTouchHelper();
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+        ((ListItemTouchHelper)callback).SetOnItemClickListener(new ListItemTouchHelper.OnItemSwipeListener() {
+            @Override
+            public void onItemSwipe(int position) {
+                mStoreDbAdapter.deleteStore(mStoreList.get(position));
+                mStoreList.remove(position);
+                mStoreAdaptor.notifyDataSetChanged();
+                Toast.makeText(StoreListActivity.this, "position: " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+        recyclerView.setAdapter(null);
+    }
+
+    public static class StoreLoader extends AsyncTaskLoader<List<Store>> {
+
+        public StoreLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<Store> loadInBackground() {
+            return (StoreDbAdapter.getInstance().getStoreCount() == 0) ? new ArrayList<Store>()
+                    :(ArrayList<Store>) StoreDbAdapter.getInstance().getAllStore();
         }
     }
 }

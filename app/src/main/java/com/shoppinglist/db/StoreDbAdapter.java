@@ -20,7 +20,7 @@ public class StoreDbAdapter {
     private static final String KEY_NAME = "name";
     private static final String TABLE_ITEMS = "items";
     private static final String KEY_ARRAY_ID = "arrayid";
-    private static final String DROP_STORES_TABLE = "DROP TABLE IF EXISTS " + TABLE_STORE;
+    public static final String DROP_STORES_TABLE = "DROP TABLE IF EXISTS " + TABLE_STORE;
     private static StoreDbAdapter mInstance = null;
 
     private static final int KEY_INDEX = 0;

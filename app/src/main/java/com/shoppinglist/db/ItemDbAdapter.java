@@ -20,7 +20,7 @@ public class ItemDbAdapter {
     private static final String KEY_NAME = "name";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_ARRAY_ID = "arrayid";
-    private static final String DROP_ITEMS_TABLE = "DROP TABLE IF EXISTS " + TABLE_ITEMS;
+    public static final String DROP_ITEMS_TABLE = "DROP TABLE IF EXISTS " + TABLE_ITEMS;
     private static ItemDbAdapter mInstance = null;
 
 

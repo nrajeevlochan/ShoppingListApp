@@ -2,10 +2,14 @@ package com.shoppinglist.app;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,8 +26,10 @@ import com.shoppinglist.R;
 import com.shoppinglist.db.ItemDbAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ItemListActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener {
+public class ItemListActivity extends AppCompatActivity implements
+        PopUpInputDialog.NoticeDialogListener, LoaderManager.LoaderCallbacks {
 
     private static final String LOG_TAG = ItemListActivity.class.getSimpleName();
     private static final int ACTION_EDIT = 0;
@@ -31,14 +37,14 @@ public class ItemListActivity extends AppCompatActivity implements PopUpInputDia
     private static final int DEFAULT_INDEX = -1;
 
     private ItemAdaptor mItemAdaptor;
-    private ArrayList<Item> mItemset = null;
+    private ArrayList<Item> mItemList = null;
     private int mEditItemIndex = -1;
     private ItemDbAdapter mItemDbAdapter;
     private long mArrayIndex = DEFAULT_INDEX;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        RecyclerView recyclerView;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list_display);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -64,50 +70,7 @@ public class ItemListActivity extends AppCompatActivity implements PopUpInputDia
 
         mItemDbAdapter = ItemDbAdapter.getInstance();
 
-        recyclerView = (RecyclerView) findViewById(R.id.list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        mItemset = (mItemDbAdapter.getItemCount(mArrayIndex) == 0) ? new ArrayList<Item>()
-                :(ArrayList<Item>) mItemDbAdapter.getAllItem(mArrayIndex);
-
-        mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, mItemset);
-        recyclerView.setAdapter(mItemAdaptor);
-
-        // Add onclick listener
-        mItemAdaptor.SetOnItemClickListener(new ItemAdaptor.OnItemClickListener() {
-            @Override
-            public void onItemClick(int actionType, int position) {
-                // do something with position
-                if (mItemset != null && !mItemset.isEmpty()) {
-                    switch (actionType) {
-                        case ACTION_EDIT:
-                            Utils.showDialog(ItemListActivity.this, Constants.ITEM_INPUT_DIALOG, mItemset.get(position));
-                            setEditItemIndex(position);
-                            break;
-                        case ACTION_DELETE:
-                            mItemDbAdapter.deleteItem(mItemset.get(position));
-                            mItemset.remove(position);
-                            mItemAdaptor.notifyDataSetChanged();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        });
-
-        ItemTouchHelper.Callback callback = new ListItemTouchHelper();
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-        ((ListItemTouchHelper)callback).SetOnItemClickListener(new ListItemTouchHelper.OnItemSwipeListener() {
-            @Override
-            public void onItemSwipe(int position) {
-                mItemDbAdapter.deleteItem(mItemset.get(position));
-                mItemset.remove(position);
-                mItemAdaptor.notifyDataSetChanged();
-            }
-        });
+        getSupportLoaderManager().initLoader(2, null, this).forceLoad();
     }
 
     @Override
@@ -148,11 +111,11 @@ public class ItemListActivity extends AppCompatActivity implements PopUpInputDia
         if (index == -1) {
             Item item = new Item(mArrayIndex, stringName, stringDescription);
             mItemDbAdapter.insertItem(item);
-            mItemset.add(item);
+            mItemList.add(item);
         } else {
-            mItemset.get(index).setName(stringName);
-            mItemset.get(index).setDescription(stringDescription);
-            mItemDbAdapter.updateItem(mItemset.get(index));
+            mItemList.get(index).setName(stringName);
+            mItemList.get(index).setDescription(stringDescription);
+            mItemDbAdapter.updateItem(mItemList.get(index));
             setEditItemIndex(-1);
         }
         mItemAdaptor.notifyDataSetChanged();
@@ -183,7 +146,7 @@ public class ItemListActivity extends AppCompatActivity implements PopUpInputDia
                     if (stringName != null && !stringName.isEmpty()) {
                         Item item = new Item(mArrayIndex, stringName, "");
                         mItemDbAdapter.insertItem(item);
-                        mItemset.add(item);
+                        mItemList.add(item);
                         mItemAdaptor.notifyDataSetChanged();
                     }
                 }
@@ -191,6 +154,78 @@ public class ItemListActivity extends AppCompatActivity implements PopUpInputDia
             default:
                 Log.w(LOG_TAG, "Not handled speech resultCode");
                 break;
+        }
+    }
+
+    @Override
+    public Loader<List<Item>> onCreateLoader(int id, Bundle args) {
+        return new ItemLoader(ItemListActivity.this, mArrayIndex);
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object data) {
+        recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mItemList = (ArrayList<Item>) data;
+
+        mItemAdaptor = new ItemAdaptor(this, R.layout.item_layout, mItemList);
+        recyclerView.setAdapter(mItemAdaptor);
+
+        // Add onclick listener
+        mItemAdaptor.SetOnItemClickListener(new ItemAdaptor.OnItemClickListener() {
+            @Override
+            public void onItemClick(int actionType, int position) {
+                // do something with position
+                if (mItemList != null && !mItemList.isEmpty()) {
+                    switch (actionType) {
+                        case ACTION_EDIT:
+                            Utils.showDialog(ItemListActivity.this, Constants.ITEM_INPUT_DIALOG, mItemList.get(position));
+                            setEditItemIndex(position);
+                            break;
+                        case ACTION_DELETE:
+                            mItemDbAdapter.deleteItem(mItemList.get(position));
+                            mItemList.remove(position);
+                            mItemAdaptor.notifyDataSetChanged();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        });
+
+        ItemTouchHelper.Callback callback = new ListItemTouchHelper();
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+        ((ListItemTouchHelper)callback).SetOnItemClickListener(new ListItemTouchHelper.OnItemSwipeListener() {
+            @Override
+            public void onItemSwipe(int position) {
+                mItemDbAdapter.deleteItem(mItemList.get(position));
+                mItemList.remove(position);
+                mItemAdaptor.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+        recyclerView.setAdapter(null);
+    }
+
+    public static class ItemLoader extends AsyncTaskLoader<List<Item>> {
+        long index;
+
+        public ItemLoader(Context context, long index) {
+            super(context);
+            this.index = index;
+        }
+
+        @Override
+        public List<Item> loadInBackground() {
+            return (ItemDbAdapter.getInstance().getItemCount(index) == 0) ? new ArrayList<Item>()
+                    :(ArrayList<Item>) ItemDbAdapter.getInstance().getAllItem(index);
         }
     }
 }
