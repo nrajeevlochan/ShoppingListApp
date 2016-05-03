@@ -38,9 +38,10 @@ public class StoreDbAdapter {
         SQLiteDatabase db = DataBaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, store.getName());
-
         // Inserting Row
-        return db.insert(TABLE_STORE, null, values);
+        long rowId = db.insert(TABLE_STORE, null, values);
+        DataBaseManager.getInstance().closeDatabase();
+        return rowId;
     }
 
     // code to update the single item
@@ -51,8 +52,10 @@ public class StoreDbAdapter {
         values.put(KEY_NAME, store.getName());
 
         // updating row
-        return db.update(TABLE_STORE, values, KEY_ID + " = ?",
+         int rowCount = db.update(TABLE_STORE, values, KEY_ID + " = ?",
                 new String[]{String.valueOf(store.getId())});
+        DataBaseManager.getInstance().closeDatabase();
+        return rowCount;
     }
 
     // Deleting single item
@@ -61,6 +64,7 @@ public class StoreDbAdapter {
         deleteItems(store.getId());
         db.delete(TABLE_STORE, KEY_ID + " = ?",
                 new String[]{String.valueOf(store.getId())});
+        DataBaseManager.getInstance().closeDatabase();
     }
 
     // code to get the single item
@@ -76,6 +80,7 @@ public class StoreDbAdapter {
             store = new Store(Integer.parseInt(cursor.getString(KEY_INDEX)),
                     cursor.getString(NAME_INDEX));
         }
+        DataBaseManager.getInstance().closeDatabase();
         // return contact
         return store;
     }
@@ -87,7 +92,7 @@ public class StoreDbAdapter {
         Cursor cursor = db.rawQuery(countQuery, null);
         int count = cursor.getCount();
         cursor.close();
-
+        DataBaseManager.getInstance().closeDatabase();
         // return count
         return count;
     }
@@ -111,7 +116,7 @@ public class StoreDbAdapter {
                 storeList.add(store);
             } while (cursor.moveToNext());
         }
-
+        DataBaseManager.getInstance().closeDatabase();
         // return item list
         return storeList;
     }
@@ -131,5 +136,6 @@ public class StoreDbAdapter {
                         new String[]{String.valueOf(index)});
             } while (cursor.moveToNext());
         }
+        DataBaseManager.getInstance().closeDatabase();
     }
 }

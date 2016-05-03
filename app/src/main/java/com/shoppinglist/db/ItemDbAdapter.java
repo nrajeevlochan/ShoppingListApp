@@ -46,6 +46,7 @@ public class ItemDbAdapter {
 
         // Inserting Row
         db.insert(TABLE_ITEMS, null, values);
+        DataBaseManager.getInstance().closeDatabase();
     }
 
     // code to update the single item
@@ -57,9 +58,11 @@ public class ItemDbAdapter {
         values.put(KEY_ARRAY_ID, item.getArrayId());
         values.put(KEY_DESCRIPTION, item.getDescription());
 
-        // updating row
-        return db.update(TABLE_ITEMS, values, KEY_ID + " = ?",
+        int rowcount = db.update(TABLE_ITEMS, values, KEY_ID + " = ?",
                 new String[]{String.valueOf(item.getId())});
+        DataBaseManager.getInstance().closeDatabase();
+        // updating row
+        return rowcount;
     }
 
     // Deleting single item
@@ -67,6 +70,7 @@ public class ItemDbAdapter {
         SQLiteDatabase db = DataBaseManager.getInstance().openDatabase();
         db.delete(TABLE_ITEMS, KEY_ID + " = ?",
                 new String[]{String.valueOf(item.getId())});
+        DataBaseManager.getInstance().closeDatabase();
     }
 
     // code to get the single item
@@ -83,6 +87,7 @@ public class ItemDbAdapter {
             item = new Item(Integer.parseInt(cursor.getString(KEY_INDEX)), Integer.parseInt(cursor.getString(ARRAY_INDEX)),
                     cursor.getString(NAME_INDEX), cursor.getString(DESCRIPTION_INDEX));
         }
+        DataBaseManager.getInstance().closeDatabase();
         // return contact
         return item;
     }
@@ -95,7 +100,7 @@ public class ItemDbAdapter {
         Cursor cursor = db.rawQuery(countQuery, args);
         int count = cursor.getCount();
         cursor.close();
-
+        DataBaseManager.getInstance().closeDatabase();
         // return count
         return count;
     }
@@ -122,7 +127,7 @@ public class ItemDbAdapter {
                 itemList.add(item);
             } while (cursor.moveToNext());
         }
-
+        DataBaseManager.getInstance().closeDatabase();
         // return item list
         return itemList;
     }
