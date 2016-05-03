@@ -1,7 +1,6 @@
 package com.shoppinglist.db;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -36,7 +35,7 @@ public class StoreDbAdapter {
 
     // code to add the new item
     public long insertStore(Store store) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, store.getName());
 
@@ -46,7 +45,7 @@ public class StoreDbAdapter {
 
     // code to update the single item
     public int updateStore(Store store) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         Log.d("ItemDbAdapter", "Update item: " + store.getName() + " " + store.getId());
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, store.getName());
@@ -58,7 +57,7 @@ public class StoreDbAdapter {
 
     // Deleting single item
     public void deleteStore(Store store) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         deleteItems(store.getId());
         db.delete(TABLE_STORE, KEY_ID + " = ?",
                 new String[]{String.valueOf(store.getId())});
@@ -66,7 +65,7 @@ public class StoreDbAdapter {
 
     // code to get the single item
     public Store getStore(int id) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         Cursor cursor = db.query(TABLE_STORE, new String[]{KEY_ID,
                         KEY_NAME}, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
@@ -83,7 +82,7 @@ public class StoreDbAdapter {
 
     // Getting items Count
     public int getStoreCount() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         String countQuery = "SELECT  * FROM " + TABLE_STORE;
         Cursor cursor = db.rawQuery(countQuery, null);
         int count = cursor.getCount();
@@ -95,7 +94,7 @@ public class StoreDbAdapter {
 
     // code to get all contacts in a list view
     public List<Store> getAllStore() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         List<Store> storeList = new ArrayList<>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_STORE;
@@ -118,7 +117,7 @@ public class StoreDbAdapter {
     }
 
     public void deleteItems(long index) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         String[] args = {String.valueOf(index)};
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_ITEMS + " WHERE " + KEY_ARRAY_ID + " = ?";

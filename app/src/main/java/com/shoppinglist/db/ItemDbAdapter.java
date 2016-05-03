@@ -1,7 +1,6 @@
 package com.shoppinglist.db;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -39,7 +38,7 @@ public class ItemDbAdapter {
 
     // code to add the new item
     public void insertItem(Item item) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, item.getName());
         values.put(KEY_ARRAY_ID, item.getArrayId());
@@ -51,7 +50,7 @@ public class ItemDbAdapter {
 
     // code to update the single item
     public int updateItem(Item item) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         Log.d("ItemDbAdapter", "Update item: " + item.getName() + " " + item.getId());
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, item.getName());
@@ -65,14 +64,14 @@ public class ItemDbAdapter {
 
     // Deleting single item
     public void deleteItem(Item item) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         db.delete(TABLE_ITEMS, KEY_ID + " = ?",
                 new String[]{String.valueOf(item.getId())});
     }
 
     // code to get the single item
     Item getItem(int id) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         Cursor cursor = db.query(TABLE_ITEMS, new String[]{KEY_ID,
                         KEY_ARRAY_ID, KEY_NAME, KEY_DESCRIPTION},
                         KEY_ID + "=?",
@@ -90,7 +89,7 @@ public class ItemDbAdapter {
 
     // Getting items Count
     public int getItemCount(long index) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         String[] args = {String.valueOf(index)};
         String countQuery = "SELECT  * FROM " + TABLE_ITEMS + " WHERE " + KEY_ARRAY_ID + " = ?";
         Cursor cursor = db.rawQuery(countQuery, args);
@@ -103,7 +102,7 @@ public class ItemDbAdapter {
 
     // code to get all contacts in a list view
     public List<Item> getAllItem(long index) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        SQLiteDatabase db = DataBaseAdapter.getInstance().openDatabase();
         List<Item> itemList = new ArrayList<>();
         String[] args = {String.valueOf(index)};
         // Select All Query
