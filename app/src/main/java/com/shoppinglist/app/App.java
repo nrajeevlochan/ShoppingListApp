@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.shoppinglist.db.DataBaseHelper;
-import com.shoppinglist.db.DataBaseAdapter;
+import com.shoppinglist.db.DataBaseManager;
 
 /**
  * Created by ${} on 5/2/16.
@@ -18,7 +18,7 @@ public class App extends Application {
         super.onCreate();
         context = this.getApplicationContext();
         dbHelper = new DataBaseHelper();
-        DataBaseAdapter.initializeInstance(dbHelper);
+        DataBaseManager.initializeInstance(dbHelper);
     }
 
     public static Context getContext() {

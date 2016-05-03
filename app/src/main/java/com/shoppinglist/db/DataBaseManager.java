@@ -6,25 +6,25 @@ import android.database.sqlite.SQLiteOpenHelper;
 /**
  * Created by ${} on 10/25/15.
  */
-public class DataBaseAdapter {
+public class DataBaseManager {
 
-    private static final String LOG_TAG = DataBaseAdapter.class.getName();
+    private static final String LOG_TAG = DataBaseManager.class.getName();
     private Integer mOpenCounter = 0;
-    private static DataBaseAdapter mInstance;
+    private static DataBaseManager mInstance;
     private SQLiteDatabase mDatabase;
     private static SQLiteOpenHelper mDbHelper;
 
     public static synchronized void initializeInstance(SQLiteOpenHelper helper) {
         if (mInstance == null) {
-            mInstance = new DataBaseAdapter();
+            mInstance = new DataBaseManager();
             mDbHelper = helper;
         }
     }
 
     // getInstance to maintain Singletone
-    public static synchronized DataBaseAdapter getInstance() {
+    public static synchronized DataBaseManager getInstance() {
         if (mInstance == null) {
-            throw new IllegalStateException(DataBaseAdapter.class.getSimpleName() +
+            throw new IllegalStateException(DataBaseManager.class.getSimpleName() +
                     " is not initialized, call initializeInstance(..) method first.");
         }
 
