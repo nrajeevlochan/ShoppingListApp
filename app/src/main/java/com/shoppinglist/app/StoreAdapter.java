@@ -16,6 +16,8 @@ import java.util.ArrayList;
  * Created by r.nalluru on 10/23/15.
  */
 public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.ViewHolder> {
+
+    private static final String LOG_TAG = StoreAdapter.class.getSimpleName();
     private Context context;
     private ArrayList<Store> storeList;
     //private HashMap<String, ArrayList<Item>> storeListItems;

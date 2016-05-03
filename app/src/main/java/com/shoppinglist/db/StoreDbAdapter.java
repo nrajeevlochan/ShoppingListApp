@@ -3,6 +3,7 @@ package com.shoppinglist.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.shoppinglist.app.Store;
@@ -13,53 +14,68 @@ import java.util.List;
 /**
  * Created by ${} on 10/25/15.
  */
-public class StoreDbAdapter extends DataBaseAdapter {
+public class StoreDbAdapter {
 
-    private static final int KEY_ID = 0;
-    private static final int NAME = 1;
+    public static final String TABLE_STORE = "store";
+    public static final String KEY_ID = "id";
+    public static final String KEY_NAME = "name";
+    public static final String TABLE_ITEMS = "items";
+    public static final String KEY_ARRAY_ID = "arrayid";
+    public static final String DROP_STORES_TABLE = "DROP TABLE IF EXISTS " + TABLE_STORE;
 
-    public StoreDbAdapter(Context context) {
-        super(context);
+    private static final int KEY_INDEX = 0;
+    private static final int NAME_INDEX = 1;
+
+    public StoreDbAdapter() {
+    }
+
+    public static String createTable(){
+        return "CREATE TABLE " + TABLE_STORE + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
     }
 
     // code to add the new item
     public long insertStore(Store store) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
-        values.put(DataBaseHelper.KEY_NAME, store.getName());
+        values.put(KEY_NAME, store.getName());
 
         // Inserting Row
-        return database.insert(DataBaseHelper.TABLE_STORE, null, values);
+        return db.insert(TABLE_STORE, null, values);
     }
 
     // code to update the single item
     public int updateStore(Store store) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         Log.d("ItemDbAdapter", "Update item: " + store.getName() + " " + store.getId());
         ContentValues values = new ContentValues();
-        values.put(DataBaseHelper.KEY_NAME, store.getName());
+        values.put(KEY_NAME, store.getName());
 
         // updating row
-        return database.update(DataBaseHelper.TABLE_STORE, values, DataBaseHelper.KEY_ID + " = ?",
+        return db.update(TABLE_STORE, values, KEY_ID + " = ?",
                 new String[]{String.valueOf(store.getId())});
     }
 
     // Deleting single item
     public void deleteStore(Store store) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         deleteItems(store.getId());
-        database.delete(DataBaseHelper.TABLE_STORE, DataBaseHelper.KEY_ID + " = ?",
+        db.delete(TABLE_STORE, KEY_ID + " = ?",
                 new String[]{String.valueOf(store.getId())});
     }
 
     // code to get the single item
     public Store getStore(int id) {
-        Cursor cursor = database.query(DataBaseHelper.TABLE_STORE, new String[]{DataBaseHelper.KEY_ID,
-                        DataBaseHelper.KEY_NAME}, DataBaseHelper.KEY_ID + "=?",
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        Cursor cursor = db.query(TABLE_STORE, new String[]{KEY_ID,
+                        KEY_NAME}, KEY_ID + "=?",
                 new String[]{String.valueOf(id)}, null, null, null, null);
         Store store = null;
         if (cursor != null) {
             cursor.moveToFirst();
 
-            store = new Store(Integer.parseInt(cursor.getString(KEY_ID)),
-                    cursor.getString(NAME));
+            store = new Store(Integer.parseInt(cursor.getString(KEY_INDEX)),
+                    cursor.getString(NAME_INDEX));
         }
         // return contact
         return store;
@@ -67,8 +83,9 @@ public class StoreDbAdapter extends DataBaseAdapter {
 
     // Getting items Count
     public int getStoreCount() {
-        String countQuery = "SELECT  * FROM " + DataBaseHelper.TABLE_STORE;
-        Cursor cursor = database.rawQuery(countQuery, null);
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        String countQuery = "SELECT  * FROM " + TABLE_STORE;
+        Cursor cursor = db.rawQuery(countQuery, null);
         int count = cursor.getCount();
         cursor.close();
 
@@ -78,18 +95,19 @@ public class StoreDbAdapter extends DataBaseAdapter {
 
     // code to get all contacts in a list view
     public List<Store> getAllStore() {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         List<Store> storeList = new ArrayList<>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + DataBaseHelper.TABLE_STORE;
+        String selectQuery = "SELECT  * FROM " + TABLE_STORE;
 
-        Cursor cursor = database.rawQuery(selectQuery, null);
+        Cursor cursor = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
                 Store store = new Store();
-                store.setId(Integer.parseInt(cursor.getString(KEY_ID)));
-                store.setName(cursor.getString(NAME));
+                store.setId(Integer.parseInt(cursor.getString(KEY_INDEX)));
+                store.setName(cursor.getString(NAME_INDEX));
                 // Adding contact to list
                 storeList.add(store);
             } while (cursor.moveToNext());
@@ -100,16 +118,17 @@ public class StoreDbAdapter extends DataBaseAdapter {
     }
 
     public void deleteItems(long index) {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         String[] args = {String.valueOf(index)};
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + DataBaseHelper.TABLE_ITEMS + " WHERE " + DataBaseHelper.KEY_ARRAY_ID + " = ?";
+        String selectQuery = "SELECT  * FROM " + TABLE_ITEMS + " WHERE " + KEY_ARRAY_ID + " = ?";
 
-        Cursor cursor = database.rawQuery(selectQuery, args);
+        Cursor cursor = db.rawQuery(selectQuery, args);
 
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                database.delete(DataBaseHelper.TABLE_ITEMS, DataBaseHelper.KEY_ARRAY_ID + " = ?",
+                db.delete(TABLE_ITEMS, KEY_ARRAY_ID + " = ?",
                         new String[]{String.valueOf(index)});
             } while (cursor.moveToNext());
         }

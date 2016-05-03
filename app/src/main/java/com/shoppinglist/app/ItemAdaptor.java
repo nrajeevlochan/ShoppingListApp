@@ -18,6 +18,7 @@ import java.util.ArrayList;
  */
 public class ItemAdaptor extends RecyclerView.Adapter<ItemAdaptor.ViewHolder> {
 
+    private static final String LOG_TAG = ItemAdaptor.class.getSimpleName();
     private Context context;
     private ArrayList<Item> itemset;
     private int rowLayout;

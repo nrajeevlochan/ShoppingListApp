@@ -1,13 +1,11 @@
 package com.shoppinglist.app;
 
-import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,17 +23,18 @@ import com.shoppinglist.db.ItemDbAdapter;
 
 import java.util.ArrayList;
 
-public class ItemListDisplayActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener {
+public class ItemListActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener {
 
-    private static final String LOG_TAG = "ItemListDisplayActivity";
+    private static final String LOG_TAG = ItemListActivity.class.getSimpleName();
     private static final int ACTION_EDIT = 0;
     private static final int ACTION_DELETE = 1;
+    private static final int DEFAULT_INDEX = -1;
 
     private ItemAdaptor mItemAdaptor;
     private ArrayList<Item> mItemset = null;
     private int mEditItemIndex = -1;
     private ItemDbAdapter mItemDbAdapter;
-    private long mArrayIndex = -1;
+    private long mArrayIndex = DEFAULT_INDEX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,13 +48,13 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Utils.showDialog(ItemListDisplayActivity.this, Constants.ITEM_INPUT_DIALOG, null);
+                Utils.showDialog(ItemListActivity.this, Constants.ITEM_INPUT_DIALOG, null);
             }
         });
 
         Bundle bundle = getIntent().getExtras();
         Store store = (Store) bundle.getParcelable(Constants.STORE_ITEM_KEY);
-        mArrayIndex = (store == null) ? -1 : store.getId();
+        mArrayIndex = (store == null) ? DEFAULT_INDEX : store.getId();
         setTitle((store == null) ? "" : store.getName());
 
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
@@ -63,7 +62,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        mItemDbAdapter = new ItemDbAdapter(this);
+        mItemDbAdapter = new ItemDbAdapter();
 
         recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -83,7 +82,7 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
                 if (mItemset != null && !mItemset.isEmpty()) {
                     switch (actionType) {
                         case ACTION_EDIT:
-                            Utils.showDialog(ItemListDisplayActivity.this, Constants.ITEM_INPUT_DIALOG, mItemset.get(position));
+                            Utils.showDialog(ItemListActivity.this, Constants.ITEM_INPUT_DIALOG, mItemset.get(position));
                             setEditItemIndex(position);
                             break;
                         case ACTION_DELETE:
@@ -98,10 +97,10 @@ public class ItemListDisplayActivity extends AppCompatActivity implements PopUpI
             }
         });
 
-        ItemTouchHelper.Callback callback = new ItemMyTouchHelper();
+        ItemTouchHelper.Callback callback = new ListItemTouchHelper();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
+        ((ListItemTouchHelper)callback).SetOnItemClickListener(new ListItemTouchHelper.OnItemSwipeListener() {
             @Override
             public void onItemSwipe(int position) {
                 mItemDbAdapter.deleteItem(mItemset.get(position));

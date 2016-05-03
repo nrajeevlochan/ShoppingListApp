@@ -1,9 +1,7 @@
 package com.shoppinglist.app;
 
-import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -28,7 +26,7 @@ import java.util.ArrayList;
 
 public class StoreListActivity extends AppCompatActivity implements PopUpInputDialog.NoticeDialogListener, StoreAdapter.OnItemClickListener {
 
-    private static final String LOG_TAG = "StoreListActivitytype";
+    private static final String LOG_TAG = StoreListActivity.class.getSimpleName();
     private ArrayList<Store> mStoreList;
     private StoreAdapter mStoreAdaptor;
     private DialogFragment mStoreDialog;
@@ -52,7 +50,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
             }
         });
 
-        mStoreDbAdapter = new StoreDbAdapter(this);
+        mStoreDbAdapter = new StoreDbAdapter();
 
         recyclerView = (RecyclerView) findViewById(R.id.store_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -68,10 +66,10 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
         // Create an instance of the dialog fragment and show it
         mStoreAdaptor.SetOnItemClickListener(this);
 
-        ItemTouchHelper.Callback callback = new ItemMyTouchHelper();
+        ItemTouchHelper.Callback callback = new ListItemTouchHelper();
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-        ((ItemMyTouchHelper)callback).SetOnItemClickListener(new ItemMyTouchHelper.OnItemSwipeListener() {
+        ((ListItemTouchHelper)callback).SetOnItemClickListener(new ListItemTouchHelper.OnItemSwipeListener() {
             @Override
             public void onItemSwipe(int position) {
                 mStoreDbAdapter.deleteStore(mStoreList.get(position));
@@ -146,7 +144,7 @@ public class StoreListActivity extends AppCompatActivity implements PopUpInputDi
 
     @Override
     public void onItemClick(int position) {
-        Intent intent = new Intent(this, ItemListDisplayActivity.class);
+        Intent intent = new Intent(this, ItemListActivity.class);
         Log.d(LOG_TAG, "onItemClick" + mStoreList.get(position).getId());
         //intent.putExtra("array", storeList.get(position).getId());
         //intent.putExtra("title", storeList.get(position).getName());

@@ -5,7 +5,9 @@ import android.support.v7.widget.RecyclerView;
 /**
  * Created by r.nalluru on 10/19/15.
  */
-public class ItemMyTouchHelper extends android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback {
+public class ListItemTouchHelper extends android.support.v7.widget.helper.ItemTouchHelper.SimpleCallback {
+
+    private static final String LOG_TAG = ListItemTouchHelper.class.getSimpleName();
     //private ItemAdaptor mItemAdaptor;
     private OnItemSwipeListener mItemSwipeListener;
     /**
@@ -16,7 +18,7 @@ public class ItemMyTouchHelper extends android.support.v7.widget.helper.ItemTouc
      * and / or .
      *
      */
-    public ItemMyTouchHelper() {
+    public ListItemTouchHelper() {
         super(0, android.support.v7.widget.helper.ItemTouchHelper.LEFT | android.support.v7.widget.helper.ItemTouchHelper.RIGHT);
         //this.mItemAdaptor = itemAdaptor;
     }
