@@ -42,6 +42,7 @@ public class ItemListActivity extends AppCompatActivity implements
     private ItemDbAdapter mItemDbAdapter;
     private long mArrayIndex = DEFAULT_INDEX;
     private RecyclerView recyclerView;
+    private static final int LOADER_ID = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,7 @@ public class ItemListActivity extends AppCompatActivity implements
 
         mItemDbAdapter = ItemDbAdapter.getInstance();
 
-        getSupportLoaderManager().initLoader(2, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this).forceLoad();
     }
 
     @Override

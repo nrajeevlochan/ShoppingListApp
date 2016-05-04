@@ -40,6 +40,7 @@ public class StoreListActivity extends AppCompatActivity implements
     private static final int DIAPLAY_ITEM_LIST = 0;
     private StoreDbAdapter mStoreDbAdapter;
     private RecyclerView recyclerView;
+    private static final int LOADER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,7 @@ public class StoreListActivity extends AppCompatActivity implements
 
         mStoreDbAdapter =  StoreDbAdapter.getInstance();
 
-        getSupportLoaderManager().initLoader(1, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this).forceLoad();
     }
 
     @Override
